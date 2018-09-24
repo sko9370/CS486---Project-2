@@ -118,7 +118,7 @@ class ReflexAgent(Agent):
         else:
             # score = 1/foodMin - newFoodCount - 2/ghostMin
             score = 1/foodMin - newFoodCount - 2/ghostMin - 1/ghostDis
-        print(score)
+        #print(score)
         return score
 
 def scoreEvaluationFunction(currentGameState):
