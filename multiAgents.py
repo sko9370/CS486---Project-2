@@ -48,7 +48,10 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
-
+        '''
+        if len(legalMoves) == 2:
+            return legalMoves[1]
+        '''
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState, action):
@@ -77,25 +80,54 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
+        newFoodCount = successorGameState.getNumFood()
 
         for ghostPos in successorGameState.getGhostPositions():
             print("ghostPosition: " + str(ghostPos))
-        print("newScaredTimes: " + str(newScaredTimes))
-
-
 
         foodDis = 0
+        foodMinList = []
         for food in newFood.asList():
             foodDis += manhattanDistance(food, newPos)
+            foodMinList.append(manhattanDistance(food, newPos))
+
+        if len(foodMinList) == 0:
+            foodMin = 1
+        else:
+            foodMin = min(foodMinList)
 
         ghostDis = 0
         for ghost in successorGameState.getGhostPositions():
             ghostDis += manhattanDistance(ghost, newPos)
 
-        score = 2*ghostDis + foodDis
-        scoreClassic = 1.75*ghostDis - foodDis
+        if foodDis == 0:
+            foodDis = 1
+
+        if newFoodCount == 0:
+            newFoodCount = 1
+
+        if ghostDis == 0:
+            ghostDis = 1
+
+        if foodMin == 0:
+            foodMin = 1
+
+        #passes classic
+        #score = ghostDis - foodDis/newFoodCount - 3*newFoodCount
+        #passes single ghost
+        #score = -(1/ghostDis) + 1/foodDis - 3*newFoodCount
+        ''' gets 1 point
+        if sum(newScaredTimes) > 0:
+            score = 1/foodDis - 3*newFoodCount + 1/ghostDis
+        else:
+            score = 1/foodDis - 5*newFoodCount - 1/ghostDis
+        '''
+        if sum(newScaredTimes) > 0:
+            score = 1/foodDis - 3*newFoodCount + 1/ghostDis
+        else:
+            score = 1/foodMin - newFoodCount - 1/ghostDis
         print(score)
-        return scoreClassic
+        return score
 
 def scoreEvaluationFunction(currentGameState):
     """
