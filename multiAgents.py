@@ -79,8 +79,8 @@ class ReflexAgent(Agent):
         "*** YOUR CODE HERE ***"
         newFoodCount = successorGameState.getNumFood()
 
-        for ghostPos in successorGameState.getGhostPositions():
-            print("ghostPosition: " + str(ghostPos))
+        #for ghostPos in successorGameState.getGhostPositions():
+        #    print("ghostPosition: " + str(ghostPos))
 
         foodDis = 0
         foodMinList = []
@@ -113,20 +113,11 @@ class ReflexAgent(Agent):
         if ghostMin == 0:
             ghostMin = 1
 
-        #passes classic
-        #score = ghostDis - foodDis/newFoodCount - 3*newFoodCount
-        #passes single ghost
-        #score = -(1/ghostDis) + 1/foodDis - 3*newFoodCount
-        ''' gets 1 point
-        if sum(newScaredTimes) > 0:
-            score = 1/foodDis - 3*newFoodCount + 1/ghostDis
-        else:
-            score = 1/foodDis - 5*newFoodCount - 1/ghostDis
-        '''
-        if sum(newScaredTimes) > 0:
+        if sum(newScaredTimes) > 3:
             score = 1/foodMin - newFoodCount + 1/ghostMin
         else:
-            score = 1/foodMin - newFoodCount - 2/ghostMin
+            # score = 1/foodMin - newFoodCount - 2/ghostMin
+            score = 1/foodMin - newFoodCount - 2/ghostMin - 1/ghostDis
         print(score)
         return score
 
