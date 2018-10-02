@@ -116,7 +116,6 @@ class ReflexAgent(Agent):
         if sum(newScaredTimes) > 3:
             score = 1/foodMin - newFoodCount + 1/ghostMin
         else:
-            # score = 1/foodMin - newFoodCount - 2/ghostMin
             score = 1/foodMin - newFoodCount - 2/ghostMin - 1/ghostDis
         #print(score)
         return score
@@ -174,7 +173,49 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        import sys
+
+        maxDepth = self.depth
+        currentDepth = -1
+
+        def maxValue(gameState, agent):
+            v = -sys.maxsize
+            legalActions = gameState.getLegalActions(agent)
+            greatAction = 0
+            scores = [self.evaluationFunction(gameState, action) for action in legalActions]
+            bestScore = max(scores)
+            return bestScore
+
+        def minValue(gameState, agent):
+            v = sys.maxsize
+            legalActions = gameState.getLegalActions(agent)
+            scores = [self.evaluationFunction(gameState, action) for action in legalActions]
+            worstScore = min(scores)
+            return worstScore
+
+        def bestAction(gameState, agent):
+            numAgents = gameState.getNumAgents()
+            if agent >= numAgents:
+                agent = agent % 3
+            # if terminal state, return state's utility/score
+            if gameState.isWin() or gameState.isLose():
+                return (gameState.getScore(), "terminal")
+            # pacman
+            elif agent == 0:
+                return maxValue(gameState, agent)
+            else:
+                return minValue(gameState, agent)
+
+        # Collect legal moves and successor states
+        legalMoves = gameState.getLegalActions()
+
+        # Choose one of the best actions
+        scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        bestScore = max(scores)
+        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+
+        return legalMoves[chosenIndex]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
