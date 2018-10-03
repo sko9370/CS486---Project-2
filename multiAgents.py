@@ -174,8 +174,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        import sys
-
         maxDepth = self.depth
         numAgents = gameState.getNumAgents()
 
@@ -239,7 +237,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # Collect legal moves and successor states
         legalMoves = gameState.getLegalActions(0)
 
-        # Choose one of the best actions
+        # abstract first max node to keep track of action
         scores = [minValue(gameState.generateSuccessor(0, action), 1, 1) for action in legalMoves]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
@@ -257,7 +255,80 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        maxDepth = self.depth
+        numAgents = gameState.getNumAgents()
+
+        import sys
+        maxInt = sys.maxsize
+        minInt = -sys.maxsize
+
+        def maxValue(gameState, agent, depth, alpha, beta):
+            legalActions = gameState.getLegalActions(agent)
+            scores = []
+            for action in legalActions:
+                # terminal state, calculate gameState score
+                if gameState.isWin() or gameState.isLose():
+                    v = self.evaluationFunction(gameState)
+                # non-terminal
+                else:
+                    v = minValue(gameState.generateSuccessor(agent, action), agent + 1, depth, alpha, beta)
+
+                if v > beta:
+                    return v
+                alpha = max(alpha, v)
+                scores.append(v)
+
+            if not scores:
+                return self.evaluationFunction(gameState)
+            else:
+                bestScore = max(scores)
+                return bestScore
+
+        def minValue(gameState, agent, depth, alpha, beta):
+            legalActions = gameState.getLegalActions(agent)
+            scores = []
+            for action in legalActions:
+                # terminal state, calculate gameState score
+                if gameState.isWin() or gameState.isLose():
+                    v = self.evaluationFunction(gameState)
+                # non-terminal
+                elif agent < numAgents - 1:
+                    v = minValue(gameState.generateSuccessor(agent, action), agent + 1, depth, alpha, beta)
+                else:
+                    if depth == maxDepth:
+                        v = self.evaluationFunction(gameState.generateSuccessor(agent, action))
+                    else:
+                        v = maxValue(gameState.generateSuccessor(agent, action), 0, depth + 1, alpha, beta)
+
+                if v < alpha:
+                    return v
+                alpha = min(beta, v)
+                scores.append(v)
+
+            if not scores:
+                return self.evaluationFunction(gameState)
+            else:
+                worstScore = min(scores)
+                return worstScore
+
+        # Collect legal moves and successor states
+        legalActions = gameState.getLegalActions(0)
+
+        # abstract first max node to keep track of action
+        scores = []
+        theAlpha = minInt
+        theBeta = maxInt
+        for action in legalActions:
+            v = minValue(gameState.generateSuccessor(0, action), 1, 1, theAlpha, theBeta)
+            if v > theBeta:
+                return action
+            theBeta = max(theAlpha, v)
+            scores.append(v)
+        bestScore = max(scores)
+        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        chosenIndex = random.choice(bestIndices)
+
+        return legalActions[chosenIndex]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
