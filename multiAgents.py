@@ -18,6 +18,9 @@ import random, util
 
 from game import Agent
 
+import search
+import searchAgents
+
 class ReflexAgent(Agent):
     """
       A reflex agent chooses an action at each choice point by examining
@@ -405,7 +408,7 @@ def betterEvaluationFunction(currentGameState):
 
     # Useful information you can extract from a GameState (pacman.py)
     # tuple (x,y)
-    newPos = currentGameState.getPacmanPosition()
+    pacmanPos = currentGameState.getPacmanPosition()
     # list of list with true/false, true where food exists
     newFood = currentGameState.getFood()
     # list of each ghost states, use .getPosition
@@ -414,44 +417,64 @@ def betterEvaluationFunction(currentGameState):
 
     "*** YOUR CODE HERE ***"
     newFoodCount = currentGameState.getNumFood()
-
-    #for ghostPos in successorGameState.getGhostPositions():
-    #    print("ghostPosition: " + str(ghostPos))
+    if newFoodCount == 0:
+        newFoodCount = -1
 
     foodDis = 0
     foodMinList = []
     for food in newFood.asList():
-        foodDis += manhattanDistance(food, newPos)
-        foodMinList.append(manhattanDistance(food, newPos))
+        #dis = searchAgents.mazeDistance(food, pacmanPos, currentGameState)
+        dis = manhattanDistance(food, pacmanPos)
+        foodDis += dis
+        foodMinList.append(dis)
     if len(foodMinList) == 0:
         foodMin = 1
     else:
         foodMin = min(foodMinList)
+    if foodDis == 0:
+        foodDis = 1
 
     ghostDis = 0
     ghostMinList = []
     for ghost in currentGameState.getGhostPositions():
-        ghostDis += manhattanDistance(ghost, newPos)
-        ghostMinList.append(manhattanDistance(ghost, newPos))
-    if len(foodMinList) == 0:
+        dis = manhattanDistance(ghost, pacmanPos)
+        ghostDis += dis
+        ghostMinList.append(dis)
+    if len(foodMinList) == 0 or not ghostMinList:
         ghostMin = 1
     else:
         ghostMin = min(ghostMinList)
-
-    if foodDis == 0:
-        foodDis = 1
-    if newFoodCount == 0:
-        newFoodCount = -1
     if ghostDis == 0:
         ghostDis = 1
-    if foodMin == 0:
-        foodMin = 1
     if ghostMin == 0:
         ghostMin = 1
 
-    if sum(newScaredTimes) > 3:
-        score = 1/foodMin - newFoodCount + 1/ghostMin
+    minCapsuleDis = 0
+    sumCapsuleDis = 0
+    numCapsules = len(currentGameState.getCapsules())
+    for capsule in currentGameState.getCapsules():
+        sumCapsuleDis += searchAgents.mazeDistance(capsule, pacmanPos, currentGameState)
+
+
+    if minCapsuleDis == 0 or numCapsules == 0:
+        minCapsuleDis = 1
+        sumCapsuleDis = 1
     else:
+        minCapsuleDis = sumCapsuleDis/numCapsules
+
+    # pacman ate a capsule and can now eat ghosts
+    if sum(newScaredTimes) > 1:
+        score = 1/foodMin - newFoodCount + 1/ghostDis
+    # pacman is vulnerable to ghosts
+    else:
+        # original
+        # score = 1/foodMin - newFoodCount - 2/ghostMin - 1/ghostDis
+
+        #score = 1/foodMin + 100/newFoodCount - 2/ghostMin - 1/ghostDis + 1/sumCapsuleDis + 100/numCapsules
+
+        # the closer the ghost, want capsule more
+        # print(numCapsules)
+        # score = 1/foodMin + 3/newFoodCount + 1/minCapsuleDis - 2/ghostMin - 1/ghostDis
         score = 1/foodMin - newFoodCount - 2/ghostMin - 1/ghostDis
     return score
 
