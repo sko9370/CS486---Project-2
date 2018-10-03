@@ -347,7 +347,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         numAgents = gameState.getNumAgents()
 
         def maxValue(gameState, agent, depth):
-            #print("from max with agent: " + str(agent))
             legalActions = gameState.getLegalActions(agent)
             scores = []
             for action in legalActions:
@@ -365,7 +364,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 return bestScore
 
         def expValue(gameState, agent, depth):
-            #print("from min with agent: " + str(agent))
             legalActions = gameState.getLegalActions(agent)
             scores = []
             for action in legalActions:
@@ -374,7 +372,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                     scores.append(self.evaluationFunction(gameState))
                 # non-terminal
                 elif agent < numAgents - 1:
-                    #print("not last agent")
                     scores.append(expValue(gameState.generateSuccessor(agent, action), agent + 1, depth))
                 else:
                     if depth == maxDepth:
@@ -393,7 +390,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         scores = [expValue(gameState.generateSuccessor(0, action), 1, 1) for action in legalActions]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        chosenIndex = random.choice(bestIndices)
 
         return legalActions[chosenIndex]
 
