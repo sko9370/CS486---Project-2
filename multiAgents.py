@@ -302,7 +302,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
                 if v < alpha:
                     return v
-                alpha = min(beta, v)
+                beta = min(beta, v)
                 scores.append(v)
 
             if not scores:
@@ -322,7 +322,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             v = minValue(gameState.generateSuccessor(0, action), 1, 1, theAlpha, theBeta)
             if v > theBeta:
                 return action
-            theBeta = max(theBeta, v)
+            theAlpha = max(theAlpha, v)
             scores.append(v)
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
