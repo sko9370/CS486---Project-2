@@ -173,6 +173,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+
         import sys
 
         maxDepth = self.depth
@@ -180,7 +181,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         def maxValue(gameState, agent, depth):
             #print("from max with agent: " + str(agent))
-            v = -sys.maxsize
             legalActions = gameState.getLegalActions(agent)
             scores = []
             for action in legalActions:
@@ -199,7 +199,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         def minValue(gameState, agent, depth):
             #print("from min with agent: " + str(agent))
-            v = sys.maxsize
             legalActions = gameState.getLegalActions(agent)
             scores = []
             for action in legalActions:
@@ -213,8 +212,18 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     scores.append(minValue(gameState.generateSuccessor(agent, action), agent + 1, depth))
                 else:
                     if depth == maxDepth:
-                        #print("last agent at max depth")
-                        scores.append(self.evaluationFunction(gameState))
+                        # print("last agent at max depth")
+                        # lightninlu10. 2018 Oct 02. Assistance given to author, posted code.
+                        # This user had a completed version of the minimax portion of this project.
+                        # The only thing I had different before looking at this code was in line 226
+                        # where I called self.evaluationFunction on the gameState instead of its
+                        # successor with respect to the action. I knew this from the error that
+                        # autograder.py showed. After looking at the code linked below, I fixed it
+                        # so that self.evaluationFunction was being called on the successor.
+                        # West Point, NY.
+                        # https://github.com/lightninglu10/pacman-minimax/blob/master/multiAgents.py
+
+                        scores.append(self.evaluationFunction(gameState.generateSuccessor(agent, action)))
                     else:
                         #print("last agent but not at max depth")
                         scores.append(maxValue(gameState.generateSuccessor(agent, action), 0, depth + 1))
