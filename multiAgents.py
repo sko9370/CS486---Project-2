@@ -402,7 +402,58 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Useful information you can extract from a GameState (pacman.py)
+    # tuple (x,y)
+    newPos = currentGameState.getPacmanPosition()
+    # list of list with true/false, true where food exists
+    newFood = currentGameState.getFood()
+    # list of each ghost states, use .getPosition
+    newGhostStates = currentGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+    "*** YOUR CODE HERE ***"
+    newFoodCount = currentGameState.getNumFood()
+
+    #for ghostPos in successorGameState.getGhostPositions():
+    #    print("ghostPosition: " + str(ghostPos))
+
+    foodDis = 0
+    foodMinList = []
+    for food in newFood.asList():
+        foodDis += manhattanDistance(food, newPos)
+        foodMinList.append(manhattanDistance(food, newPos))
+    if len(foodMinList) == 0:
+        foodMin = 1
+    else:
+        foodMin = min(foodMinList)
+
+    ghostDis = 0
+    ghostMinList = []
+    for ghost in currentGameState.getGhostPositions():
+        ghostDis += manhattanDistance(ghost, newPos)
+        ghostMinList.append(manhattanDistance(ghost, newPos))
+    if len(foodMinList) == 0:
+        ghostMin = 1
+    else:
+        ghostMin = min(ghostMinList)
+
+    if foodDis == 0:
+        foodDis = 1
+    if newFoodCount == 0:
+        newFoodCount = -1
+    if ghostDis == 0:
+        ghostDis = 1
+    if foodMin == 0:
+        foodMin = 1
+    if ghostMin == 0:
+        ghostMin = 1
+
+    if sum(newScaredTimes) > 3:
+        score = 1/foodMin - newFoodCount + 1/ghostMin
+    else:
+        score = 1/foodMin - newFoodCount - 2/ghostMin - 1/ghostDis
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
