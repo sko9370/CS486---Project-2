@@ -322,11 +322,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             v = minValue(gameState.generateSuccessor(0, action), 1, 1, theAlpha, theBeta)
             if v > theBeta:
                 return action
-            theBeta = max(theAlpha, v)
+            theBeta = max(theBeta, v)
             scores.append(v)
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices)
+        chosenIndex = bestIndices[0]
 
         return legalActions[chosenIndex]
 
