@@ -179,7 +179,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         numAgents = gameState.getNumAgents()
 
         def maxValue(gameState, agent, depth):
-            print("from max with agent: " + str(agent))
+            #print("from max with agent: " + str(agent))
             v = -sys.maxsize
             legalActions = gameState.getLegalActions(agent)
             scores = []
@@ -191,40 +191,42 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 else:
                     scores.append(minValue(gameState.generateSuccessor(agent, action), agent + 1, depth))
 
-            bestScore = max(scores)
-            return bestScore
+            if not scores:
+                return self.evaluationFunction(gameState)
+            else:
+                bestScore = max(scores)
+                return bestScore
 
         def minValue(gameState, agent, depth):
-            print("from min with agent: " + str(agent))
+            #print("from min with agent: " + str(agent))
             v = sys.maxsize
             legalActions = gameState.getLegalActions(agent)
             scores = []
             for action in legalActions:
                 # terminal state, calculate gameState score
                 if gameState.isWin() or gameState.isLose():
-                    print("terminal")
+                    #print("terminal")
                     scores.append(self.evaluationFunction(gameState))
                 # non-terminal
                 elif agent < numAgents - 1:
-                    print("not last agent")
+                    #print("not last agent")
                     scores.append(minValue(gameState.generateSuccessor(agent, action), agent + 1, depth))
-                elif agent == numAgents-1:
+                else:
                     if depth == maxDepth:
-                        print("last agent at max depth")
+                        #print("last agent at max depth")
                         scores.append(self.evaluationFunction(gameState))
                     else:
-                        print("last agent but not at max depth")
+                        #print("last agent but not at max depth")
                         scores.append(maxValue(gameState.generateSuccessor(agent, action), 0, depth + 1))
-                # if there are more agents left
-                else:
-                    print("shouldn't be here")
-                    scores.append(self.evaluationFunction(gameState))
 
-            worstScore = min(scores)
-            return worstScore
+            if not scores:
+                return self.evaluationFunction(gameState)
+            else:
+                worstScore = min(scores)
+                return worstScore
 
-        print("\nnumber of agents: " + str(numAgents))
-        print("\nmax depth: " + str(maxDepth))
+        #print("\nnumber of agents: " + str(numAgents))
+        #print("\nmax depth: " + str(maxDepth))
         # Collect legal moves and successor states
         legalMoves = gameState.getLegalActions(0)
 
